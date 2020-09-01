@@ -3,6 +3,10 @@ const compression = require('compression');
 const { ApolloServer} = require('apollo-server-express');
 const { gql } = require('apollo-server-express');
 
+const { PubSub } = require('apollo-server');
+
+const pubsub = new PubSub();
+
 const http = require('http');
 const PORT = process.env.port || 3017;
 
@@ -20,9 +24,9 @@ const typeDefs = gql`
 		addName (name: String!) : Boolean
 	}
 
-	# type Subscription {
-
-	# }
+	type Subscription {
+		nameAdded: String
+	}
 
 `;
 
@@ -42,11 +46,16 @@ const resolvers = {
 	Mutation : {
 		addName : function(_, {name}) {
 			names.push(name);
+			pubsub.publish("NAME_ADDED", { nameAdded: name });
+
 		}
 	},
-	// Subscription : {
+	Subscription : {
+		nameAdded : {
+			subscribe: () => pubsub.asyncIterator(["NAME_ADDED"])
+		}
 
-	// }
+	}
 };
 
 const apolloServer = new ApolloServer({ 
@@ -59,6 +68,7 @@ const apolloServer = new ApolloServer({
 
 app.use(compression()); 
 apolloServer.applyMiddleware({ app });
+apolloServer.installSubscriptionHandlers(httpServer);
 
 // app.use(express.static('dist'));
 
