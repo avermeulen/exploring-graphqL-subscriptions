@@ -10,7 +10,7 @@ const { PubSub } = require('apollo-server');
 const pubsub = new PubSub();
 
 const http = require('http');
-const PORT = process.env.port || 3017;
+const PORT = process.env.PORT || 3017;
 
 const app = express();
 const httpServer = http.createServer(app);
