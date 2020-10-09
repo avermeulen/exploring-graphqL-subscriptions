@@ -54960,12 +54960,12 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-// alert(JSON.stringify(process.env.GRAPHQL_URL));
+alert(JSON.stringify("http://localhost/graphql"));
 var httpLink = new _client.HttpLink({
-  uri: "http://localhost:3017/graphql"
+  uri: "http://localhost/graphql"
 });
 var wsLink = new _ws.WebSocketLink({
-  uri: "ws://localhost:3017/graphql",
+  uri: "ws://localhost/graphql",
   options: {
     reconnect: true
   }
@@ -55088,7 +55088,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59277" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60053" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

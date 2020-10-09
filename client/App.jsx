@@ -9,7 +9,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import { useSubscription, useQuery, useMutation } from '@apollo/react-hooks';
 
 
-// alert(JSON.stringify(process.env.GRAPHQL_URL));
+alert(JSON.stringify(process.env.GRAPHQL_URL));
 
 const httpLink = new HttpLink({
   uri: process.env.GRAPHQL_URL 
