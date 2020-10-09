@@ -109,10 +109,15 @@ function Query () {
   if (loading)
     return "loading..."
 
-  return <div>
+
+  if (data) {
+    return <div>
     <Data counter={data.nameCount}/>
     <AddName />
   </div>
+  }
+  
+  return "No data..."
 
 }
 

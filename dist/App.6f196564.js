@@ -54960,12 +54960,11 @@ function _templateObject() {
 
 function _taggedTemplateLiteral(strings, raw) { if (!raw) { raw = strings.slice(0); } return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
-alert(JSON.stringify("http://localhost/graphql"));
 var httpLink = new _client.HttpLink({
-  uri: "http://localhost/graphql"
+  uri: "http://localhost:3017/graphql"
 });
 var wsLink = new _ws.WebSocketLink({
-  uri: "ws://localhost/graphql",
+  uri: "ws://localhost:3017/graphql",
   options: {
     reconnect: true
   }
@@ -55047,13 +55046,17 @@ function Query() {
       loading = _useQuery.loading;
 
   if (loading) return "loading...";
-  return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Data, {
-    counter: data.nameCount
-  }), /*#__PURE__*/_react.default.createElement(AddName, null));
+
+  if (data) {
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Data, {
+      counter: data.nameCount
+    }), /*#__PURE__*/_react.default.createElement(AddName, null));
+  }
+
+  return "No data...";
 }
 
 function App() {
-  // alert(process.env.name);
   return /*#__PURE__*/_react.default.createElement(_reactHooks.ApolloProvider, {
     client: apolloClient
   }, /*#__PURE__*/_react.default.createElement(Query, null));
@@ -55088,7 +55091,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60053" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63754" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
