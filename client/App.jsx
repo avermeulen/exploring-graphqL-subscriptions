@@ -116,11 +116,7 @@ function Query () {
 
 }
 
-
-
 function App() {
-
-  // alert(process.env.name);
 
 	return <ApolloProvider client={apolloClient}>
     <Query />
