@@ -54916,10 +54916,40 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
+function _templateObject5() {
+  var data = _taggedTemplateLiteral(["\n    query getNames {\n        names {\n          name\n        }\n    }\n  "]);
+
+  _templateObject5 = function _templateObject5() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject4() {
+  var data = _taggedTemplateLiteral(["\n    subscription nameUpdated($name: String) {\n      nameUpdated (name : $name) {\n        name,\n        count\n      }\n  }"]);
+
+  _templateObject4 = function _templateObject4() {
+    return data;
+  };
+
+  return data;
+}
+
 function _templateObject3() {
-  var data = _taggedTemplateLiteral(["\n    mutation addName($name : String!) {\n      addName(name : $name)\n    }\n  "]);
+  var data = _taggedTemplateLiteral(["\n    subscription nameAdded {\n      nameAdded (code : \"123\") {\n        name,\n        count\n      }\n  }"]);
 
   _templateObject3 = function _templateObject3() {
+    return data;
+  };
+
+  return data;
+}
+
+function _templateObject2() {
+  var data = _taggedTemplateLiteral(["\n    mutation addName($name : String!) {\n      addName(name : $name)\n    }\n  "]);
+
+  _templateObject2 = function _templateObject2() {
     return data;
   };
 
@@ -54938,18 +54968,8 @@ function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _templateObject2() {
-  var data = _taggedTemplateLiteral(["\n  query getName {\n    nameCount\n  }\n"]);
-
-  _templateObject2 = function _templateObject2() {
-    return data;
-  };
-
-  return data;
-}
-
 function _templateObject() {
-  var data = _taggedTemplateLiteral(["\n  subscription nameAdded {\n    nameAdded (code : \"123\") {\n      name,\n      count\n    }\n}"]);
+  var data = _taggedTemplateLiteral(["\n  query getName {\n    nameCount\n  }\n"]);
 
   _templateObject = function _templateObject() {
     return data;
@@ -54983,8 +55003,7 @@ var apolloClient = new _client.ApolloClient({
   link: link,
   cache: new _client.InMemoryCache()
 });
-var subscription = (0, _graphqlTag.default)(_templateObject());
-var userCountQuery = (0, _graphqlTag.default)(_templateObject2());
+var userCountQuery = (0, _graphqlTag.default)(_templateObject());
 
 function AddName(props) {
   var _useState = (0, _react.useState)(""),
@@ -54992,7 +55011,7 @@ function AddName(props) {
       name = _useState2[0],
       setName = _useState2[1];
 
-  var ADD_USER = (0, _graphqlTag.default)(_templateObject3());
+  var ADD_USER = (0, _graphqlTag.default)(_templateObject2());
 
   var _useMutation = (0, _reactHooks.useMutation)(ADD_USER),
       _useMutation2 = _slicedToArray(_useMutation, 1),
@@ -55005,6 +55024,8 @@ function AddName(props) {
       }
     }).then(function () {
       setName("");
+    }).catch(function (err) {
+      console.log(err);
     });
   }
 
@@ -55025,19 +55046,91 @@ function Counter(props) {
 }
 
 function Data(props) {
+  var _useState3 = (0, _react.useState)(""),
+      _useState4 = _slicedToArray(_useState3, 2),
+      currentName = _useState4[0],
+      setCurrentName = _useState4[1];
+
+  var subscription = (0, _graphqlTag.default)(_templateObject3());
+
   var _useSubscription = (0, _reactHooks.useSubscription)(subscription),
-      data = _useSubscription.data,
-      loading = _useSubscription.loading;
+      data = _useSubscription.data;
 
   if (data) {
-    return /*#__PURE__*/_react.default.createElement(Counter, {
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(Counter, {
       counter: data.nameAdded.count
-    });
+    }), /*#__PURE__*/_react.default.createElement(NameList, {
+      onChange: function onChange(name) {
+        setCurrentName(name);
+      }
+    }), /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("strong", null, "Currently filtering for: "), " ", currentName), /*#__PURE__*/_react.default.createElement(NameUpdated, {
+      name: currentName
+    }));
   } else {
     return /*#__PURE__*/_react.default.createElement(Counter, {
       counter: props.counter
     });
   }
+}
+
+function ShowThenHide(props) {
+  var _useState5 = (0, _react.useState)(props.message),
+      _useState6 = _slicedToArray(_useState5, 2),
+      message = _useState6[0],
+      setMessage = _useState6[1];
+
+  setTimeout(function () {
+    setMessage("");
+  }, 3000);
+  return message;
+}
+
+function NameUpdated(props) {
+  var subscription = (0, _graphqlTag.default)(_templateObject4());
+
+  var _useSubscription2 = (0, _reactHooks.useSubscription)(subscription, {
+    variables: {
+      name: props.name
+    }
+  }),
+      data = _useSubscription2.data;
+
+  if (data) {
+    return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(ShowThenHide, {
+      message: "".concat(props.name, " updated")
+    }));
+  }
+
+  return "";
+}
+
+function useGetNames() {
+  var GET_NAMES = (0, _graphqlTag.default)(_templateObject5());
+  return (0, _reactHooks.useQuery)(GET_NAMES);
+}
+
+function NameList(props) {
+  var _useGetNames = useGetNames(),
+      data = _useGetNames.data,
+      loading = _useGetNames.loading,
+      refetch = _useGetNames.refetch;
+
+  if (loading) return "...";
+
+  if (refetch) {
+    refetch();
+  }
+
+  var userList = data.names.map(function (user) {
+    return /*#__PURE__*/_react.default.createElement("option", null, user.name);
+  });
+  return /*#__PURE__*/_react.default.createElement("select", {
+    onChange: function onChange(evt) {
+      props.onChange(evt.target.value);
+    }
+  }, /*#__PURE__*/_react.default.createElement("option", {
+    value: ""
+  }, "Select a name"), userList);
 }
 
 function Query() {
@@ -55091,7 +55184,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63754" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50989" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

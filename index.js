@@ -28,7 +28,13 @@ const typeDefs = gql`
 	}
 
 	type Subscription {
-		nameAdded (code: String) : User
+		nameAdded (code: String) : UserUpdate
+		nameUpdated (name: String) : UserUpdate
+	}
+
+	type UserUpdate {
+		user: User
+		count: Int!
 	}
 
 	type User {
@@ -62,10 +68,21 @@ const resolvers = {
 				names.push({ name });
 				pubsub.publish("NAME_ADDED", {
 					nameAdded: {
-						name,
+						user : {name, count : 1},
 						count: names.length
 					}
 				});
+			} else {
+				
+				currentName.count++;
+
+				pubsub.publish("NAME_UPDATED", {
+					nameUpdated: {
+						user : currentName,
+						count: names.length
+					}
+				});
+
 			}
 		}
 	},
@@ -74,13 +91,19 @@ const resolvers = {
 			subscribe: withFilter(() => pubsub.asyncIterator(["NAME_ADDED"]),
 				(payload, variables) => {
 
-					console.log(payload);
-					console.log(variables);
+					// console.log(payload);
+					// console.log(variables);
 
 					return true;
 				})
+		},
+		nameUpdated: {
+			subscribe: withFilter(() => pubsub.asyncIterator(["NAME_UPDATED"]),
+				({nameUpdated}, {name}) => {
+					const {user} = nameUpdated;
+					return user.name === name;
+				})
 		}
-
 	}
 };
 

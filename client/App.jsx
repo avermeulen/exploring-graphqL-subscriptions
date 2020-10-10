@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import gql from 'graphql-tag';
@@ -41,14 +41,6 @@ const apolloClient = new ApolloClient({
 	cache: new InMemoryCache()
 })
 
-const subscription = gql`
-  subscription nameAdded {
-    nameAdded (code : "123") {
-      name,
-      count
-    }
-}`;
-
 const  userCountQuery = gql`
   query getName {
     nameCount
@@ -74,6 +66,8 @@ function AddName(props) {
       }
     }).then(function() {
       setName("");
+    }).catch(function(err){
+      console.log(err);
     })
   }
 
@@ -93,13 +87,111 @@ function Counter (props) {
 }
 
 function Data(props) {
-  const {data,loading} = useSubscription(subscription);
+  const [currentName, setCurrentName] = useState("");
+
+  const subscription = gql`
+    subscription nameAdded {
+      nameAdded (code : "123") {
+        name,
+        count
+      }
+  }`;
+
+  const {data} = useSubscription(subscription);
 
   if (data) {
-    return <Counter counter={data.nameAdded.count} />
+    return <div>
+        <Counter counter={data.nameAdded.count} />
+        
+        <NameList onChange={(name) => {
+          setCurrentName(name)
+        }}/>
+
+        <div>
+          <strong>Currently filtering for: </strong> {currentName}
+        </div>
+
+        <NameUpdated name={currentName} />
+    </div>
+    
   } else {
     return <Counter counter={props.counter} />
   }
+}
+
+function ShowThenHide(props) {
+  const [message, setMessage] = useState(props.message);
+
+  setTimeout(function () {
+    setMessage("");
+  }, 3000);
+
+  return message;
+}
+
+function NameUpdated(props) {
+
+  const subscription = gql`
+    subscription nameUpdated($name: String) {
+      nameUpdated (name : $name) {
+        name,
+        count
+      }
+  }`;
+
+  const {data} = useSubscription(subscription, {
+      variables : {
+        name: props.name
+      }
+  });
+
+  if (data) {
+    return <div>
+        <ShowThenHide message={ `${props.name} updated`} />
+    </div>
+  }
+
+  return "";
+}
+
+function useGetNames() {
+  const GET_NAMES = gql`
+    query getNames {
+        names {
+          name
+        }
+    }
+  `;
+
+ return useQuery(GET_NAMES);
+
+}
+
+function NameList(props) {
+  
+  const {data, loading, refetch} = useGetNames();
+
+  if (loading)
+    return "...";
+
+  if (refetch) {
+    refetch();
+  }
+
+
+  const userList = data.names.map((user) => {
+    return <option>
+      {user.name}
+    </option>
+  });
+
+return <select onChange={(evt) => {
+  props.onChange(evt.target.value)
+} } >
+  <option value="">Select a name</option>
+  {userList}
+</select>
+
 }
 
 function Query () {
@@ -109,15 +201,18 @@ function Query () {
   if (loading)
     return "loading..."
 
-
   if (data) {
     return <div>
     <Data counter={data.nameCount}/>
     <AddName />
+    
+
+
   </div>
   }
   
   return "No data..."
+
 
 }
 
