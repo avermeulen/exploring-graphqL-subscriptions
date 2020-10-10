@@ -90,10 +90,6 @@ const resolvers = {
 		nameAdded: {
 			subscribe: withFilter(() => pubsub.asyncIterator(["NAME_ADDED"]),
 				(payload, variables) => {
-
-					// console.log(payload);
-					// console.log(variables);
-
 					return true;
 				})
 		},

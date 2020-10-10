@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
-import gql from 'graphql-tag';
 import { split, HttpLink, ApolloClient, InMemoryCache } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { ApolloProvider } from '@apollo/react-hooks';
-import { useSubscription, useQuery, useMutation } from '@apollo/react-hooks';
+import AddName from './AddName';
+import ManageNames from './ManageNames';
 
 const httpLink = new HttpLink({
-  uri: process.env.GRAPHQL_URL 
+  uri: process.env.GRAPHQL_URL
 });
 
 const wsLink = new WebSocketLink({
@@ -37,192 +37,20 @@ const link = split(
 );
 
 const apolloClient = new ApolloClient({
-	link,
-	cache: new InMemoryCache()
+  link,
+  cache: new InMemoryCache()
 })
 
-const  userCountQuery = gql`
-  query getName {
-    nameCount
-  }
-`;
-
-function AddName(props) {
-
-  const [name, setName]  = useState("");
-
-  const ADD_USER = gql`
-    mutation addName($name : String!) {
-      addName(name : $name)
-    }
-  `;
-
-  const [mutate] = useMutation(ADD_USER);
-
-  function addName(){
-    mutate({
-      variables : {
-        name
-      }
-    }).then(function() {
-      setName("");
-    }).catch(function(err){
-      console.log(err);
-    })
-  }
-
-  return <div>
-    <div >
-      <input type="text" onChange={(evt) => setName(evt.target.value)} value={name}  />
-    </div>
-    <div>
-      <button onClick={addName} disabled={name.length < 3} >Add name</button>
-    </div>
-  </div>
-}
-
-
-function Counter (props) {
-  return <div>User count: <span > {props.counter}</span> </div>
-}
-
-function Data(props) {
-  const [currentName, setCurrentName] = useState("");
-
-  const subscription = gql`
-    subscription nameAdded {
-      nameAdded (code : "123") {
-        name,
-        count
-      }
-  }`;
-
-  const {data} = useSubscription(subscription);
-
-  if (data) {
-    return <div>
-        <Counter counter={data.nameAdded.count} />
-        
-        <NameList onChange={(name) => {
-          setCurrentName(name)
-        }}/>
-
-        <div>
-          <strong>Currently filtering for: </strong> {currentName}
-        </div>
-
-        <NameUpdated name={currentName} />
-    </div>
-    
-  } else {
-    return <Counter counter={props.counter} />
-  }
-}
-
-function ShowThenHide(props) {
-  const [message, setMessage] = useState(props.message);
-
-  setTimeout(function () {
-    setMessage("");
-  }, 3000);
-
-  return message;
-}
-
-function NameUpdated(props) {
-
-  const subscription = gql`
-    subscription nameUpdated($name: String) {
-      nameUpdated (name : $name) {
-        name,
-        count
-      }
-  }`;
-
-  const {data} = useSubscription(subscription, {
-      variables : {
-        name: props.name
-      }
-  });
-
-  if (data) {
-    return <div>
-        <ShowThenHide message={ `${props.name} updated`} />
-    </div>
-  }
-
-  return "";
-}
-
-function useGetNames() {
-  const GET_NAMES = gql`
-    query getNames {
-        names {
-          name
-        }
-    }
-  `;
-
- return useQuery(GET_NAMES);
-
-}
-
-function NameList(props) {
-  
-  const {data, loading, refetch} = useGetNames();
-
-  if (loading)
-    return "...";
-
-  if (refetch) {
-    refetch();
-  }
-
-
-  const userList = data.names.map((user) => {
-    return <option>
-      {user.name}
-    </option>
-  });
-
-return <select onChange={(evt) => {
-  props.onChange(evt.target.value)
-} } >
-  <option value="">Select a name</option>
-  {userList}
-</select>
-
-}
-
-function Query () {
-
-  const {data, loading} = useQuery(userCountQuery);
-	
-  if (loading)
-    return "loading..."
-
-  if (data) {
-    return <div>
-    <Data counter={data.nameCount}/>
-    <AddName />
-    
-
-
-  </div>
-  }
-  
-  return "No data..."
-
-
-}
 
 function App() {
 
-	return <ApolloProvider client={apolloClient}>
-    <Query />
-	</ApolloProvider>
-	
-	;
+  return <ApolloProvider client={apolloClient}>
+    <h1>Users</h1>
+    <AddName />
+    <hr/>
+    <ManageNames />
+   
+  </ApolloProvider>;
 }
 
 ReactDOM.render(<App />, document.querySelector('.container'));
