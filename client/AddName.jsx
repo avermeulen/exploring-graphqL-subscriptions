@@ -33,8 +33,8 @@ export default function AddName(props) {
 				<input id="name" className="form-control" type="text" onChange={(evt) => setName(evt.target.value)} value={name} />
 			</div>
 			<div>
-				<button class="btn btn-primary" onClick={addName} disabled={name.length < 3}>Add name</button>
+				<button className="btn btn-primary" onClick={addName} disabled={name.length < 3}>Add name</button>
 			</div>
-		</div>;
+		</div>
   </div>
 }

@@ -6,6 +6,7 @@ export function useGetNames() {
   const GET_NAMES = gql`
     query getNames {
         names {
+          count
           name
         }
     }

@@ -7,6 +7,17 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 import { ApolloProvider } from '@apollo/react-hooks';
 import AddName from './AddName';
 import ManageNames from './ManageNames';
+import { NameUpdateListener } from "./NameUpdateListener";
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams
+} from "react-router-dom";
+
+
 
 const httpLink = new HttpLink({
   uri: process.env.GRAPHQL_URL
@@ -41,14 +52,35 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache()
 })
 
+function JoinUser() {
+  const {username} = useParams();
+  return <div>
+    <div className="alert alert-primary" role="alert">
+      Listening for updates for <strong>{username}</strong>
+    </div>
+
+    <AddName />
+    <NameUpdateListener name={username} />
+
+    <ManageNames />
+
+
+  </div>
+}
 
 function App() {
 
   return <ApolloProvider client={apolloClient}>
     <h1>Users</h1>
-    <AddName />
-    <hr/>
-    <ManageNames />
+    
+    {/* <hr/> */}
+    {/* <ManageNames /> */}
+    <Router basename="/#/" >
+      
+      <Switch>
+        <Route path="/join/:username" children={<JoinUser />} />
+      </Switch>
+    </Router>
    
   </ApolloProvider>;
 }

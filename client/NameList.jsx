@@ -14,21 +14,17 @@ export function NameList(props) {
 		refetch();
 	}
 	const userList = data.names.map((user) => {
-		return <option key={user.name} >
-			{user.name}
-		</option>;
+		return <li key={user.name} >
+			({user.count}) {user.name}
+		</li>;
 	});
 
 	return <div className="row" >
 		<div className="col-6" >
 			<Counter counter={userList.length} />
-
-			<select className="form-control" onChange={(evt) => {
-				props.onChange(evt.target.value);
-			}}>
-				<option value="">Select a name</option>
+			<ul>
 				{userList}
-			</select>
+			</ul>
 		</div>
 	</div>;
 }

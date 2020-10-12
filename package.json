@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "react": "parcel client/index.html",
     "react-prod": "NODE_ENV=production parcel client/index.html",
-    "heroku-postbuild" : "NODE_ENV=production parcel build client/index.html",
+    "heroku-postbuild": "NODE_ENV=production parcel build client/index.html",
     "start": "node index.js"
   },
   "author": "",
@@ -25,6 +25,7 @@
     "http": "0.0.1-security",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
     "subscriptions-transport-ws": "^0.9.18"
   },
   "devDependencies": {

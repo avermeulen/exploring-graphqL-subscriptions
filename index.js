@@ -2,8 +2,8 @@ const express = require('express');
 const compression = require('compression');
 const { ApolloServer } = require('apollo-server-express');
 const { withFilter } = require('apollo-server');
+const typeDefs = require('./typeDefs');
 
-const { gql } = require('apollo-server-express');
 
 const { PubSub } = require('apollo-server');
 
@@ -14,35 +14,6 @@ const PORT = process.env.PORT || 3017;
 
 const app = express();
 const httpServer = http.createServer(app);
-
-const typeDefs = gql`
-
-	type Query {
-		_ (name: String!) : String
-		nameCount: Int!
-		names : [User]
-	}
-
-	type Mutation {
-		addName (name: String!) : Boolean
-	}
-
-	type Subscription {
-		nameAdded (code: String) : UserUpdate
-		nameUpdated (name: String) : UserUpdate
-	}
-
-	type UserUpdate {
-		user: User
-		count: Int!
-	}
-
-	type User {
-		name: String
-		count: Int
-	}
-
-`;
 
 const names = [];
 
@@ -63,23 +34,30 @@ const resolvers = {
 	Mutation: {
 		addName: function (_, { name }) {
 			const currentName = names.find(n => n.name == name);
-
+			
 			if (!currentName) {
-				names.push({ name });
+
+
+				names.push({ name, count : 1 });
 				pubsub.publish("NAME_ADDED", {
 					nameAdded: {
-						user : {name, count : 1},
+						user : {
+							name, 
+							count : 1
+						},
 						count: names.length
 					}
 				});
 			} else {
-				
+				// console.log(currentName);
 				currentName.count++;
+				console.log(currentName);
+				console.log("----------->");
 
 				pubsub.publish("NAME_UPDATED", {
 					nameUpdated: {
-						user : currentName,
-						count: names.length
+						...currentName
+					
 					}
 				});
 
@@ -97,7 +75,8 @@ const resolvers = {
 			subscribe: withFilter(() => pubsub.asyncIterator(["NAME_UPDATED"]),
 				({nameUpdated}, {name}) => {
 					const {user} = nameUpdated;
-					return user.name === name;
+					// return user.name === name;
+					return true;
 				})
 		}
 	}
